@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/me-apple-touch-icon.png?v=7.4.1">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/MIYOSHI-favicon-32x32.png?v=7.4.1">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/MIYOSHI-favicon-16x16.png?v=7.4.1">
+  <link rel="mask-icon" href="/images/me-safari-pinned-tab.svg?v=7.4.1" color="#222">
+  <link rel="alternate" href="/atom.xml" title="SkrBang" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.1">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"mac"},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":true},
+    bookmark: {"enable":true,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: true,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":5,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Part 2.我在 GitHub 上开源了这个系列文章的翻译版（还在跟进原作者的更新），第一次公开翻译英文教程，纯粹兴趣使然，错漏和不严谨在所难免……欢迎提出意见和建议，或者成为 Contributor。:books: :books: :books: 原文：《Let’s Build A Web Server. Part 2.》">
+<meta name="keywords" content="翻译,Web Server,Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="翻译：Let&#39;s Build A Web Server.Part 2">
+<meta property="og:url" content="https:&#x2F;&#x2F;s-huabomb.github.io&#x2F;2019&#x2F;10&#x2F;18&#x2F;%E7%BF%BB%E8%AF%91%EF%BC%9ALet&#39;s%20Build%20A%20Web%20Server.Part%202&#x2F;index.html">
+<meta property="og:site_name" content="SkrBang">
+<meta property="og:description" content="Part 2.我在 GitHub 上开源了这个系列文章的翻译版（还在跟进原作者的更新），第一次公开翻译英文教程，纯粹兴趣使然，错漏和不严谨在所难免……欢迎提出意见和建议，或者成为 Contributor。:books: :books: :books: 原文：《Let’s Build A Web Server. Part 2.》">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721153452334.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721153928628.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721154420414.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721155538694.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721185532139.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721190059614.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1J1bl9Cb21i,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721190647621.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721191218216.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1J1bl9Cb21i,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721192754833.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721205141288.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721210736385.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721211208398.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721212122891.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721212338260.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;2019072121363354.png">
+<meta property="og:updated_time" content="2019-10-18T13:11:27.053Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190721153452334.png">
+  <link rel="canonical" href="https://s-huabomb.github.io/2019/10/18/%E7%BF%BB%E8%AF%91%EF%BC%9ALet's%20Build%20A%20Web%20Server.Part%202/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>翻译：Let's Build A Web Server.Part 2 | SkrBang</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SkrBang</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Doing Is Better Than Done</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      
+    
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger">
+          <i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/S-HuaBomb" class="github-corner" title="MIYOSHI Forever!" aria-label="MIYOSHI Forever!" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://s-huabomb.github.io/2019/10/18/%E7%BF%BB%E8%AF%91%EF%BC%9ALet's%20Build%20A%20Web%20Server.Part%202/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="SkrBanger">
+      <meta itemprop="description" content="Beautiful is Better Than Ugly">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SkrBang">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            翻译：Let's Build A Web Server.Part 2
+            
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-18 17:31:40 / 修改时间：21:11:27" itemprop="dateCreated datePublished" datetime="2019-10-18T17:31:40+08:00">2019-10-18</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BF%BB%E8%AF%91/" itemprop="url" rel="index">
+                    <span itemprop="name">翻译</span>
+                  </a>
+                </span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BF%BB%E8%AF%91/Web-Server/" itemprop="url" rel="index">
+                    <span itemprop="name">Web Server</span>
+                  </a>
+                </span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BF%BB%E8%AF%91/Web-Server/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2019/10/18/%E7%BF%BB%E8%AF%91%EF%BC%9ALet's%20Build%20A%20Web%20Server.Part%202/" class="post-meta-item leancloud_visitors" data-flag-title="翻译：Let's Build A Web Server.Part 2" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+        
+      
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/10/18/%E7%BF%BB%E8%AF%91%EF%BC%9ALet's%20Build%20A%20Web%20Server.Part%202/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/10/18/%E7%BF%BB%E8%AF%91%EF%BC%9ALet's%20Build%20A%20Web%20Server.Part%202/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">本文字数：</span>
+              
+              <span>11k</span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>10 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h5 id="Part-2"><a href="#Part-2" class="headerlink" title="Part 2."></a>Part 2.</h5><p>我在 <a href="https://github.com/S-HuaBomb/Build-a-Web-Server-Translate" target="_blank" rel="noopener">GitHub</a> 上开源了这个系列文章的翻译版（还在跟进原作者的更新），第一次公开翻译英文教程，纯粹兴趣使然，错漏和不严谨在所难免……欢迎提出意见和建议，或者成为 Contributor。</p><p>:books: :books: :books: </p><p>原文：《<a href="https://ruslanspivak.com/lsbaws-part2/" target="_blank" rel="noopener">Let’s Build A Web Server. Part 2.</a>》</p><a id="more"></a>
+
+
+<hr>
+<p>还记得，在 <a href="https://blog.csdn.net/Run_Bomb/article/details/96710139" target="_blank" rel="noopener">Part 1</a> 中，我问了一个问题：“如何在新创建的 Web 服务器下运行 Django 应用程序，Flask 应用程序和 Pyramid 应用程序，而无需对服务器进行单一更改以适应所有这些不同的Web框架？”， 继续阅读，找出答案。</p>
+<p>过去，你选择的 Python Web 框架会限制你对可用 Web 服务器的选择，反之亦然。 如果框架和服务器设计为一起工作，那么没有任何问题：<br><img src="https://img-blog.csdnimg.cn/20190721153452334.png" alt="lsbaws_part2_before_wsgi"></p>
+<p>但是当你尝试将服务器和并非一起工作的框架组合在一起时，你可能会遇到以下问题（也许你曾经遇到过）：<br><img src="https://img-blog.csdnimg.cn/20190721153928628.png" alt="lsbaws_part2_after_wsgi"></p>
+<p>基本上你必须使用一起工作的服务器和框架，而不是你可能想要使用的那个。</p>
+<p>那么，你如何确保可以运行具有多个 Web 框架的 Web 服务器，而无需对 Web 服务器或 Web 框架进行代码更改？而这个问题的答案就在于 Python Web 服务器网关接口（简称WSGI，发音为“wizgy”）。<br><img src="https://img-blog.csdnimg.cn/20190721154420414.png" alt="lsbaws_part2_wsgi_idea"></p>
+<p>WSGI 允许开发人员将 Web 框架的选择与 Web 服务器的选择分开。现在，你可以放心地混合和匹配 Web 服务器和 Web 框架，并选择适合你需求的配对。例如，你可以使用 Gunicorn 或 Nginx / uWSGI 或 Waitress 来运行 Django，Flask 或 Pyramid。 真正的混合和匹配，得益于服务器和框架中的 WSGI 支持：<br><img src="https://img-blog.csdnimg.cn/20190721155538694.png" alt="lsbaws_part2_wsgi_interop"></p>
+<p>因此，WSGI 是我在 <a href="https://blog.csdn.net/Run_Bomb/article/details/96710139" target="_blank" rel="noopener">Part 1</a> 末尾向你提出并在本文开头重复的问题的答案。 你的 Web 服务器必须实现 WSGI 接口的服务器部分，并且所有现代 Python Web 框架都已实现了 WSGI 接口的框架端，这允许你将这些框架与 Web 服务器一起使用，而无需修改服务器的代码去适应特定的 Web 框架。</p>
+<p>现在你知道 Web 服务器和 Web 框架的 WSGI 支持允许你选择适合你的配对，它同时对服务器和框架开发人员也是有益的，因为他们可以专注于他们擅长的专业领域而不是彼此手忙脚乱。其他语言也有类似的接口：例如，Java 有 Servlet API，Ruby 有 Rack。</p>
+<p>现在自我感觉良好，但我打赌你会说：“Show me the code!”。好的，看看这个非常简约的 WSGI 服务器实现：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用 Python 3.7+ 测试通过 (Mac OS X)</span></span><br><span class="line"><span class="keyword">import</span> io</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WSGIServer</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    address_family = socket.AF_INET</span><br><span class="line">    socket_type = socket.SOCK_STREAM</span><br><span class="line">    request_queue_size = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, server_address)</span>:</span></span><br><span class="line">        <span class="comment"># 创建一个监听套接字</span></span><br><span class="line">        self.listen_socket = listen_socket = socket.socket(</span><br><span class="line">            self.address_family,</span><br><span class="line">            self.socket_type</span><br><span class="line">        )</span><br><span class="line">        <span class="comment"># 允许重用同一个地址</span></span><br><span class="line">        listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># 绑定网址</span></span><br><span class="line">        listen_socket.bind(server_address)</span><br><span class="line">        <span class="comment"># 激活（开始监听）</span></span><br><span class="line">        listen_socket.listen(self.request_queue_size)</span><br><span class="line">        <span class="comment"># 获取服务器主机和端口</span></span><br><span class="line">        host, port = self.listen_socket.getsockname()[:<span class="number">2</span>]</span><br><span class="line">        self.server_name = socket.getfqdn(host)</span><br><span class="line">        self.server_port = port</span><br><span class="line">        <span class="comment"># 用于存放 Web 框架或 Web 应用返回的请求头</span></span><br><span class="line">        self.headers_set = []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_app</span><span class="params">(self, application)</span>:</span></span><br><span class="line">        self.application = application</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">serve_forever</span><span class="params">(self)</span>:</span></span><br><span class="line">        listen_socket = self.listen_socket</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="comment"># 新的客户端连接</span></span><br><span class="line">            self.client_connection, client_address = listen_socket.accept()</span><br><span class="line">            <span class="comment"># 处理完一个请求后关闭客户端连接. 接着</span></span><br><span class="line">            <span class="comment"># 循环等待其他客户端的连接</span></span><br><span class="line">            self.handle_one_request()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle_one_request</span><span class="params">(self)</span>:</span></span><br><span class="line">        request_data = self.client_connection.recv(<span class="number">1024</span>)</span><br><span class="line">        self.request_data = request_data = request_data.decode(<span class="string">'utf-8'</span>)</span><br><span class="line">        <span class="comment"># 打印格式化后的请求数据</span></span><br><span class="line">        print(<span class="string">''</span>.join(</span><br><span class="line">            <span class="string">f'&lt; <span class="subst">&#123;line&#125;</span>\n'</span> <span class="keyword">for</span> line <span class="keyword">in</span> request_data.splitlines()</span><br><span class="line">        ))</span><br><span class="line"></span><br><span class="line">        self.parse_request(request_data)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 使用请求数据构造环境字典</span></span><br><span class="line">        env = self.get_environ()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 是时候调用我们的 application 方法并获得 HTTP 的响应主体的结果</span></span><br><span class="line">        result = self.application(env, self.start_response)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 构建一个响应并返回到客户端</span></span><br><span class="line">        self.finish_response(result)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_request</span><span class="params">(self, text)</span>:</span></span><br><span class="line">        request_line = text.splitlines()[<span class="number">0</span>]</span><br><span class="line">        request_line = request_line.rstrip(<span class="string">'\r\n'</span>)</span><br><span class="line">        <span class="comment"># 将请求行分解为组件</span></span><br><span class="line">        (self.request_method,  <span class="comment"># GET</span></span><br><span class="line">         self.path,            <span class="comment"># /hello</span></span><br><span class="line">         self.request_version  <span class="comment"># HTTP/1.1</span></span><br><span class="line">         ) = request_line.split()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_environ</span><span class="params">(self)</span>:</span></span><br><span class="line">        env = &#123;&#125;</span><br><span class="line">        <span class="comment"># 以下代码段没有遵循 PEP8 约定，但它的格式与演示目的相同，以强调所需的变量及其值</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment"># 需要用到的 WSGI 参数</span></span><br><span class="line">        env[<span class="string">'wsgi.version'</span>]      = (<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">        env[<span class="string">'wsgi.url_scheme'</span>]   = <span class="string">'http'</span></span><br><span class="line">        env[<span class="string">'wsgi.input'</span>]        = io.StringIO(self.request_data)</span><br><span class="line">        env[<span class="string">'wsgi.errors'</span>]       = sys.stderr</span><br><span class="line">        env[<span class="string">'wsgi.multithread'</span>]  = <span class="literal">False</span></span><br><span class="line">        env[<span class="string">'wsgi.multiprocess'</span>] = <span class="literal">False</span></span><br><span class="line">        env[<span class="string">'wsgi.run_once'</span>]     = <span class="literal">False</span></span><br><span class="line">        <span class="comment"># 需要用到的 CGI 参数</span></span><br><span class="line">        env[<span class="string">'REQUEST_METHOD'</span>]    = self.request_method    <span class="comment"># GET</span></span><br><span class="line">        env[<span class="string">'PATH_INFO'</span>]         = self.path              <span class="comment"># /hello</span></span><br><span class="line">        env[<span class="string">'SERVER_NAME'</span>]       = self.server_name       <span class="comment"># localhost</span></span><br><span class="line">        env[<span class="string">'SERVER_PORT'</span>]       = str(self.server_port)  <span class="comment"># 8888</span></span><br><span class="line">        <span class="keyword">return</span> env</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_response</span><span class="params">(self, status, response_headers, exc_info=None)</span>:</span></span><br><span class="line">        <span class="comment"># 添加必要的服务器请求头</span></span><br><span class="line">        server_headers = [</span><br><span class="line">            (<span class="string">'Date'</span>, <span class="string">'Mon, 15 Jul 2019 5:54:48 GMT'</span>),</span><br><span class="line">            (<span class="string">'Server'</span>, <span class="string">'WSGIServer 0.2'</span>),</span><br><span class="line">        ]</span><br><span class="line">        self.headers_set = [status, response_headers + server_headers]</span><br><span class="line">        <span class="comment"># 为了遵守 WSGI 规范，start_response 必须返回可调用的 'write'。 </span></span><br><span class="line">        <span class="comment"># 为了简单起见，我们现在忽略那个细节。返回 self.finish_response</span></span><br><span class="line">        <span class="comment"># return self.finish_response</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">finish_response</span><span class="params">(self, result)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            status, response_headers = self.headers_set</span><br><span class="line">            response = <span class="string">f'HTTP/1.1 <span class="subst">&#123;status&#125;</span>\r\n'</span></span><br><span class="line">            <span class="keyword">for</span> header <span class="keyword">in</span> response_headers:</span><br><span class="line">                response += <span class="string">'&#123;0&#125;: &#123;1&#125;\r\n'</span>.format(*header)</span><br><span class="line">            response += <span class="string">'\r\n'</span></span><br><span class="line">            <span class="keyword">for</span> data <span class="keyword">in</span> result:</span><br><span class="line">                response += data.decode(<span class="string">'utf-8'</span>)</span><br><span class="line">            <span class="comment"># 依照 'Ctrl -v' 打印格式化后的响应数据</span></span><br><span class="line">            print(<span class="string">''</span>.join(</span><br><span class="line">                <span class="string">f'&gt; <span class="subst">&#123;line&#125;</span>\n'</span> <span class="keyword">for</span> line <span class="keyword">in</span> response.splitlines()</span><br><span class="line">            ))</span><br><span class="line">            response_bytes = response.encode()</span><br><span class="line">            self.client_connection.sendall(response_bytes)</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            self.client_connection.close()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">SERVER_ADDRESS = (HOST, PORT) = <span class="string">''</span>, <span class="number">8888</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">make_server</span><span class="params">(server_address, application)</span>:</span></span><br><span class="line">    server = WSGIServer(server_address)</span><br><span class="line">    server.set_app(application)</span><br><span class="line">    <span class="keyword">return</span> server</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">if</span> len(sys.argv) &lt; <span class="number">2</span>:</span><br><span class="line">        sys.exit(<span class="string">'Provide a WSGI application object as module:callable'</span>)</span><br><span class="line">    app_path = sys.argv[<span class="number">1</span>]</span><br><span class="line">    module, application = app_path.split(<span class="string">':'</span>)</span><br><span class="line">    module = __import__(module)</span><br><span class="line">    application = getattr(module, application)</span><br><span class="line">    httpd = make_server(SERVER_ADDRESS, application)</span><br><span class="line">    print(<span class="string">f'WSGIServer: Serving HTTP on port <span class="subst">&#123;PORT&#125;</span> ...\n'</span>)</span><br><span class="line">    httpd.serve_forever()</span><br></pre></td></tr></table></figure><br>它肯定比 <a href="https://blog.csdn.net/Run_Bomb/article/details/96710139" target="_blank" rel="noopener">Part 1</a> 中的服务器代码更大，但它也足够小（不到150行），你可以理解而不会被细节困扰。上面的服务器也能做到更多——它可以运行用你心爱的 Web 框架编写的基本 Web 应用程序，无论是 Pyramid，Flask，Django 还是其他一些 Python WSGI 框架。</p>
+<p>不相信我？试一试，亲身体会吧。 将上述代码保存为 <code>webserver2.py</code> 或直接从 <a href="https://github.com/rspivak/lsbaws/blob/master/part2/webserver2.py" target="_blank" rel="noopener">GitHub</a> 下载。 如果你试图在没有任何参数的情况下运行它，它会报错并退出。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python webserver2.py</span><br><span class="line">Provide a WSGI application object as module:callable</span><br></pre></td></tr></table></figure><br>它迫切地的想要为你的 Web 应用程序提供服务，这样才会变得有趣。要运行服务器，你唯一需要安装的就是 Python（确切地说是Python 3.7+）。 但要运行使用 Pyramid，Flask 和 Django 编写的应用程序，你需要先安装这些框架。让我们安装所有这三个。我首选的方法是使用 venv（默认情况下在Python 3.3及更高版本中可用）。只需按照以下步骤创建并激活虚拟环境，然后安装这三个 Web 框架。</p>
+<blockquote>
+<p>译者注：先创建项目目录，再在目录中创建虚拟环境<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir part2</span><br><span class="line">$ cd part2</span><br></pre></td></tr></table></figure><br>译者注：请注意，在一些操作系统中，你可能需要在上面的命令中使用 python 而不是 python3 。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ python -m venv lsbaws</span><br></pre></td></tr></table></figure><br>译者注：不管你用什么方法创建虚拟环境，创建完毕之后还需要激活才能够进入这个虚拟环境。 要激活你的全新虚拟环境，需使用以下命令：（以下是 Microsoft Windows 命令提示符窗口）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ lsbaws\Scripts\activate</span><br><span class="line">(lsbaws) $ _</span><br></pre></td></tr></table></figure><br>译者注：激活一个虚拟环境，终端会话的环境配置就会被修改，之后你键入 <code>python</code> 的时候，实际上是调用的虚拟环境中的 Python 解释器。 此外，终端提示符也被修改成包含被激活的虚拟环境的名称的格式。这种激活是临时的和私有的，因此在关闭终端窗口时它们将不会保留，也不会影响其他的会话。 那么，当你需要同时打开多个终端窗口来调试不同的应用时，每个终端窗口都可以激活不同的虚拟环境而不会相互影响。<br>成功创建和激活了虚拟环境之后，你可以安装那三个框架了，命令如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">(lsbaws) $ pip install -U pip</span><br><span class="line">(lsbaws) $ pip install pyramid</span><br><span class="line">(lsbaws) $ pip install flask</span><br><span class="line">(lsbaws) $ pip install django</span><br></pre></td></tr></table></figure><br>译者注：我在 Windows10 命令行安装 pip 时遇到文件权限限制，修改整个 anaconda3 的文件权限无果，<br>便直接在命令行中加入<code>--user</code> ：<code>pip install --user -U pip</code> 成功安装 pip-19。</p>
+</blockquote>
+<p>原文作者电脑系统是 MacOS，创建虚拟环境、激活虚拟环境以及安装的过程如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ python3 -m venv lsbaws</span><br><span class="line">$ ls lsbaws</span><br><span class="line">bin   include   lib   pyvenv.cfg</span><br><span class="line">$ source lsbaws/bin/activate</span><br><span class="line">(lsbaws) $ pip install -U pip</span><br><span class="line">(lsbaws) $ pip install pyramid</span><br><span class="line">(lsbaws) $ pip install flask</span><br><span class="line">(lsbaws) $ pip install django</span><br></pre></td></tr></table></figure><br>此时，你需要创建一个 Web 应用程序。 让我们先从 Pyramid 开始吧。 将以下代码保存为 <code>pyramidapp.py</code>，放到你保存 <code>webserver2.py</code> 的同一目录下或直接从 <a href="https://github.com/rspivak/lsbaws/blob/master/part2/pyramidapp.py" target="_blank" rel="noopener">GitHub</a> 下载该文件：</p>
+<blockquote>
+<p>译者注：这些文件最好都放在上面创建的目录中，即刚刚创建的虚拟环境 <code>lsbaws</code> 的同级目录下，否则要在命令行运行这些文件时就要带上它们的绝对路径才行。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pyramid.config <span class="keyword">import</span> Configurator</span><br><span class="line"><span class="keyword">from</span> pyramid.response <span class="keyword">import</span> Response</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello_world</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> Response(</span><br><span class="line">        <span class="string">'Hello world from Pyramid!\n'</span>,</span><br><span class="line">        content_type=<span class="string">'text/plain'</span>,</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">config = Configurator()</span><br><span class="line">config.add_route(<span class="string">'hello'</span>, <span class="string">'/hello'</span>)</span><br><span class="line">config.add_view(hello_world, route_name=<span class="string">'hello'</span>)</span><br><span class="line">app = config.make_wsgi_app()</span><br></pre></td></tr></table></figure><br>现在，你已准备好使用自己的 Web 服务器为 Pyramid 应用程序提供服务：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(lsbaws) $ python webserver2.py pyramidapp:app</span><br><span class="line">WSGIServer: Serving HTTP on port 8888 ...</span><br></pre></td></tr></table></figure><br>译者注：可以注意到，要在激活的虚拟环境中运行上面的命令</p>
+</blockquote>
+<p>你刚刚告诉你的服务器从 python 模块 ‘<em>pyramidapp</em>‘ 加载可调用的 ‘<em>app</em>‘ 。你的服务器现在已准备好接收请求并将它们转发到你的 Pyramid 应用程序。应用程序现在只处理一个路径：<code>/hello</code> 路由。在浏览器中键入 <code>http://localhost:8888/hello</code> 地址，按 Enter 键，然后观察结果：<br><img src="https://img-blog.csdnimg.cn/20190721185532139.png" alt="lsbaws_part2_browser_pyramid"></p>
+<p>你还可以使用 <em>‘curl’</em> 工具程序在另一个命令窗口上测试这个服务器：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -v http://localhost:8888/hello</span><br><span class="line">...</span><br></pre></td></tr></table></figure><br>查看服务器和 <code>curl -v</code> 打印到标准输出的内容。</p>
+<blockquote>
+<p>译者注：这是我的运行结果：</p>
+<blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20190721190059614.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1J1bl9Cb21i,size_16,color_FFFFFF,t_70" alt="mytest-curl-pyramid"></p>
+</blockquote>
+</blockquote>
+<p>现在轮到 Flask。我们按照相同的步骤。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Response</span><br><span class="line">flask_app = Flask(<span class="string">'flaskapp'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@flask_app.route('/hello')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello_world</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> Response(</span><br><span class="line">        <span class="string">'Hello world from Flask!\n'</span>,</span><br><span class="line">        mimetype=<span class="string">'text/plain'</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">app = flask_app.wsgi_app</span><br></pre></td></tr></table></figure><br>将上面的代码保存为 <code>flaskapp.py</code> 或从 <a href="https://github.com/rspivak/lsbaws/blob/master/part2/flaskapp.py" target="_blank" rel="noopener">GitHub</a>下载，然后运行服务器如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(lsbaws) $ python webserver2.py flaskapp:app</span><br><span class="line">WSGIServer: Serving HTTP on port 8888 ...</span><br></pre></td></tr></table></figure><br>现在在浏览器中键入 <code>http://localhost:8888/hello</code>，然后按 Enter 键：<br><img src="https://img-blog.csdnimg.cn/20190721190647621.png" alt="lsbaws_part2_browser_flask"></p>
+<p>再次尝试 <em>‘curl’</em> 并亲自看看服务器返回 Flask 应用程序生成的消息：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -v http://localhost:8888/hello</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>译者注：这是我的运行结果：</p>
+<blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20190721191218216.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1J1bl9Cb21i,size_16,color_FFFFFF,t_70" alt="mytest-curl-flask"></p>
+</blockquote>
+</blockquote>
+<p>服务器还可以处理 Django 应用程序吗？ 试试看！但是，它有点复杂，我建议克隆整个 repo 并使用其中的 <code>djangoapp.py</code>，它是 <a href="https://github.com/rspivak/lsbaws/" target="_blank" rel="noopener">GitHub repository</a> 的一部分。这是源代码，它基本上将Django ‘helloworld’ 项目（使用 Django 的 <code>django-admin.py startproject</code> 命令预先创建）添加到当前的 Python 路径，然后导入项目的 WSGI 应用程序。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line">sys.path.insert(<span class="number">0</span>, <span class="string">'./helloworld'</span>)</span><br><span class="line"><span class="keyword">from</span> helloworld <span class="keyword">import</span> wsgi</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">app = wsgi.application</span><br></pre></td></tr></table></figure><br>将上面的代码保存为 <code>djangoapp.py</code> 并使用 Web 服务器运行这个 Django 应用程序：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(lsbaws) $ python webserver2.py djangoapp:app</span><br><span class="line">WSGIServer: Serving HTTP on port 8888 ...</span><br></pre></td></tr></table></figure><br>输入以下网址，然后按 Enter 键：<br><img src="https://img-blog.csdnimg.cn/20190721192754833.png" alt="lsbaws_part2_browser_django"></p>
+<p>就像你之前已经做过的那几次，你也可以在命令行上进行测试，并确认这次是处理你的请求的 Django 应用程序：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -v http://localhost:8888/hello</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>译者注：服务器已经成功在 Windows10 下的命令行终端中挂起，但在 chrome 浏览器中访问 <code>http://localhost:8888/hello</code> 时出现 <code>DisallowedHost at /
+Invalid HTTP_HOST header: &#39;DESKTOP-E61P8KD:8888&#39;. You may need to add &#39;desktop-e61p8kd&#39; to ALLOWED_HOSTS.</code> 这样的错误。暂且搁置，待日后重提。</p>
+</blockquote>
+<p>你试过吗？你已经确认了这个服务器能和这三个框架一起工作了吗？ 如果没有，那么请试一试。 阅读很重要，但这个系列是关于重构的，这意味着你需要亲力亲为。去尝试吧，我会等着你，别担心。不是说，你必须尝试它，只是那样的话会更好，自己重新输入所有内容，并确保它按预想的那样运行。</p>
+<p>好的，你已经体验过 WSGI 的强大功能：它允许你混合搭配 Web 服务器和 Web 框架。 WSGI 在Python Web 服务器和 Python Web 框架之间提供了一个最小的接口。它非常简单，并且很容易在服务器端和框架端实现。以下代码段显示了接口的服务器端和框架端：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_application</span><span class="params">(application)</span>:</span></span><br><span class="line">    <span class="string">"""Server code."""</span></span><br><span class="line">    <span class="comment"># 这是应用程序/框架存储 HTTP 状态和 HTTP 响应头的位置，供服务器传输到客户端</span></span><br><span class="line">    headers_set = []</span><br><span class="line">    <span class="comment"># 带有 WSGI / CGI 变量的环境字典</span></span><br><span class="line">    environ = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">start_response</span><span class="params">(status, response_headers, exc_info=None)</span>:</span></span><br><span class="line">        headers_set[:] = [status, response_headers]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 服务器调用'application'并返回响应主体</span></span><br><span class="line">    result = application(environ, start_response)</span><br><span class="line">    <span class="comment"># 服务器构建HTTP响应并将其传输到客户端</span></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">app</span><span class="params">(environ, start_response)</span>:</span></span><br><span class="line">    <span class="string">"""A barebones WSGI app."""</span></span><br><span class="line">    start_response(<span class="string">'200 OK'</span>, [(<span class="string">'Content-Type'</span>, <span class="string">'text/plain'</span>)])</span><br><span class="line">    <span class="keyword">return</span> [<span class="string">b'Hello world!'</span>]</span><br><span class="line"></span><br><span class="line">run_application(app)</span><br></pre></td></tr></table></figure><br>以下是它的运行方式：</p>
+<ol>
+<li>框架提供了一个可调用的 <em>“application”</em>（WSGI 规范没有规定应该如何实现）</li>
+<li>服务器为从 HTTP 客户端接收的每个请求调用 <em>“application”</em> 。 它传递一个包含 WSGI / CGI 变量的字典 <em>‘environ’</em> 和一个可调用 <em>‘start_response’</em> 作为 <em>‘application’</em> 的参数。</li>
+<li>框架 / 应用程序生成 HTTP 状态和 HTTP 响应标头，并将它们传递给可调用的 <em>“start_response”</em>，以便服务器存储它们。框架 / 应用程序还返回响应主体。</li>
+<li>服务器将状态、响应头和响应主体组合成 HTTP 响应并将其发送到客户端（此步骤不是规范的一部分，但它是流程中的下一个逻辑步骤，为了清楚起见我添加进来）</li>
+</ol>
+<p>以下是这个接口的直观展示：<br><img src="https://img-blog.csdnimg.cn/20190721205141288.png" alt="lsbaws_part2_wsgi_interface"></p>
+<p>到目前为止，你已经看过 Pyramid、Flask 和 Django Web 应用程序，并且你已经看到了实现服务器端 WSGI 规范的服务器代码。你甚至已经看到了不使用任何框架的非正式 WSGI 应用程序代码片段。</p>
+<p>问题在于，当你使用其中一个框架编写 Web 应用程序时，你在更高级别的层次工作而不是直接使用 WSGI，但我知道你对 WSGI 接口的框架方面也很好奇，因为你在读这篇文章。因此，让我们创建一个简约的 WSGI Web 应用程序 / Web 框架，而不使用 Pyramid、Flask 或 Django，并在你的服务器上运行它：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">app</span><span class="params">(environ, start_response)</span>:</span></span><br><span class="line">    <span class="string">"""A barebones WSGI application.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    This is a starting point for your own Web framework :)</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    status = <span class="string">'200 OK'</span></span><br><span class="line">    response_headers = [(<span class="string">'Content-Type'</span>, <span class="string">'text/plain'</span>)]</span><br><span class="line">    start_response(status, response_headers)</span><br><span class="line">    <span class="keyword">return</span> [<span class="string">b'Hello world from a simple WSGI application!\n'</span>]</span><br></pre></td></tr></table></figure><br>再次，将上述代码保存成 <code>wsgiapp.py</code> 文件或直接从 <a href="https://github.com/rspivak/lsbaws/blob/master/part2/wsgiapp.py" target="_blank" rel="noopener">GitHub</a> 下载并在 Web 服务器下运行应用程序：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(lsbaws) $ python webserver2.py wsgiapp:app</span><br><span class="line">WSGIServer: Serving HTTP on port 8888 ...</span><br></pre></td></tr></table></figure><br>输入以下网址，然后按 Enter 键。 你应该看到这样的结果：<br><img src="https://img-blog.csdnimg.cn/20190721210736385.png" alt="lsbaws_part2_browser_simple_wsgi_app"></p>
+<p>在学习如何创建 Web 服务器的同时，你刚刚编写了自己的简约 WSGI Web 框架！不得了啊。</p>
+<p>现在，让我们回到服务器传输给客户端的内容。 以下是使用 HTTP 客户端调用 Pyramid 应用程序时服务器生成的 HTTP 响应：<br><img src="https://img-blog.csdnimg.cn/20190721211208398.png" alt="lsbaws_part2_http_response"></p>
+<p>响应中有一些你在 <a href="https://blog.csdn.net/Run_Bomb/article/details/96710139" target="_blank" rel="noopener">Part 1</a> 中看到的熟悉部分，但它也有一些新的东西。例如，它有四个你以前没有见过的 HTTP 标头：<em>Content-Type，Content-Length，Date</em> 和 <em>Server</em>。 这些是来自 Web 服务器的响应通常应该具有的标头。但是，没有一个是严格要求的。标头的目的是传输有关 HTTP 请求 / 响应的其他信息。</p>
+<p>现在你已经了解了有关 WSGI 接口的更多信息，以下是同样的 HTTP 响应，其中包含有关生成它的部件的更多信息：<br><img src="https://img-blog.csdnimg.cn/20190721212122891.png" alt="lsbaws_part2_http_response_explanation"></p>
+<p>我还没有提到过 <em>‘environ’</em> 字典，但基本上它是一个 Python 字典，必须包含 WSGI 规范规定的某些 WSGI 和 CGI 参数变量。解析请求后，服务器从 HTTP 请求中获取字典的值。这就是字典的内容：<br><img src="https://img-blog.csdnimg.cn/20190721212338260.png" alt="lsbaws_part2_environ"></p>
+<p>Web 框架使用来自该字典的信息来决定指定的路由、请求方法等使用哪个视图，从哪里读取请求主体以及在何处写入错误（如果有的话）。</p>
+<p>到目前为止，你已经创建了自己的 WSGI Web 服务器，并且已经使用不同的 Web 框架编写了 Web 应用程序。而且，你还在此过程中创建了你的准系统 Web 应用程序 / Web 框架。这是一段艰难的旅程。让我们回顾一下你的 WSGI Web 服务器必须做什么来提供针对 WSGI 应用程序的请求：</p>
+<ul>
+<li>首先，服务器启动并加载由 Web 框架 / 应用程序提供的可调用 <em>“application”</em></li>
+<li>然后，服务器读取一个请求</li>
+<li>接着，服务器解析这个请求</li>
+<li>再者，然后，服务器使用请求数据构建 <em>“environ”</em> 字典</li>
+<li>然后，服务器调用可调用的 <em>“application”</em>、<em>“environ”</em> 字典和可调用的 <em>“start_response”</em> 作为参数并返回响应主体。</li>
+<li>接着，服务器使用可调用 <em>‘application’</em> 对象返回的数据以及 <em>‘start_response’</em> 设置的状态和响应头来构造 HTTP 响应。</li>
+<li>最后，服务器将这个 HTTP 响应返回给客户端<br><img src="https://img-blog.csdnimg.cn/2019072121363354.png" alt="lsbaws_part2_server_summary"></li>
+</ul>
+<p>这就是它的全部内容。你现在拥有一个可用的 WSGI 服务器，可以为使用 WSGI 兼容的 Web 框架（如 Django，Flask，Pyramid 或你自己的 WSGI 框架）编写的基本 Web 应用程序提供服务。最好的一点就是服务器可以与多个 Web 框架一起使用，而无需对服务器代码库进行任何更改。简直漂亮。</p>
+<p>在你继续之前，这是另一个你可以考虑一下的问题：“你如何让你的服务器一次处理多个请求？”</p>
+<p>请继续关注，我将在 <a href="https://blog.csdn.net/Run_Bomb/article/details/96881972" target="_blank" rel="noopener">Part 3</a> 中向你展示完成它的一种方法。Cheers！</p>
+<blockquote>
+<p><strong>UPDATE: Mon, July 15, 2019</strong></p>
+<ul>
+<li>Updated the server code to run under Python 3.7+</li>
+<li>Added resources used in preparation for the article</li>
+</ul>
+</blockquote>
+<p><strong>此系列的所有文章（已翻译）：</strong></p>
+<ul>
+<li><a href="https://blog.csdn.net/Run_Bomb/article/details/96710139" target="_blank" rel="noopener">Let’s Build A Web Server. Part 1.</a></li>
+<li><a href="https://blog.csdn.net/Run_Bomb/article/details/96726186" target="_blank" rel="noopener">Let’s Build A Web Server. Part 2.</a></li>
+<li><a href="https://blog.csdn.net/Run_Bomb/article/details/96881972" target="_blank" rel="noopener">Let’s Build A Web Server. Part 3.</a>【未完待续..】</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/%E7%BF%BB%E8%AF%91/" rel="tag"># 翻译</a>
+            
+              <a href="/tags/Web-Server/" rel="tag"># Web Server</a>
+            
+              <a href="/tags/Python/" rel="tag"># Python</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/10/18/hello-world/" rel="next" title="Hello World">
+                  <i class="fa fa-chevron-left"></i> Hello World
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/10/18/%E7%BF%BB%E8%AF%91%EF%BC%9ALet's%20Build%20A%20Web%20Server.Part%201/" rel="prev" title="翻译：Let's Build A Web Server.Part 1">
+                  翻译：Let's Build A Web Server.Part 1 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="comments"></div>
+  
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#Part-2"><span class="nav-number">1.</span> <span class="nav-text">Part 2.</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.png"
+      alt="SkrBanger">
+  <p class="site-author-name" itemprop="name">SkrBanger</p>
+  <div class="site-description" itemprop="description">Beautiful is Better Than Ugly</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">SkrBanger</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">15k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">14 分钟</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.1
+  </div>
+
+        
+
+
+
+
+
+
+  
+  <script pjax>
+  function leancloudSelector(url) {
+    return document.getElementById(url).querySelector('.leancloud-visitors-count');
+  }
+  if (CONFIG.page.isPost) {
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = visitors.getAttribute('id').trim();
+      var title = visitors.getAttribute('data-flag-title').trim();
+
+      Counter('get', `/classes/Counter?where=${JSON.stringify({ url })}`)
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .then(response => response.json())
+              .then(() => {
+                leancloudSelector(url).innerText = counter.time + 1;
+              })
+            
+              .catch(error => {
+                console.log('Failed to save visitor count', error);
+              })
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.log('LeanCloud Counter Error', error);
+        });
+    }
+  } else {
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return element.getAttribute('id').trim();
+      });
+
+      Counter('get', `/classes/Counter?where=${JSON.stringify({ url: { '$in': entries } })}`)
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length === 0) {
+            document.querySelectorAll('.leancloud_visitors .leancloud-visitors-count').forEach(element => {
+              element.innerText = 0;
+            });
+            return;
+          }
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.url;
+            var time = item.time;
+            leancloudSelector(url).innerText = time;
+          }
+          for (var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = leancloudSelector(url);
+            if (element.innerText == '') {
+              element.innerText = 0;
+            }
+          }
+        })
+        .catch(error => {
+          console.log('LeanCloud Counter Error', error);
+        });
+    }
+  }
+
+  fetch('https://app-router.leancloud.cn/2/route?appId=fdjYRPruAxgdCtAqFcoYgBrk-gzGzoHsz')
+    .then(response => response.json())
+    .then(({ api_server }) => {
+      var Counter = (method, url, data) => {
+        return fetch(`https://${api_server}/1.1${url}`, {
+          method: method,
+          headers: {
+            'X-LC-Id': 'fdjYRPruAxgdCtAqFcoYgBrk-gzGzoHsz',
+            'X-LC-Key': 'a40AomloSpFnoHG6fdAdB9fo',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        const localhost = /http:\/\/(localhost|127.0.0.1|0.0.0.0)/;
+        if (localhost.test(document.URL)) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.1"></script><script src="/js/motion.js?v=7.4.1"></script>
+<script src="/js/schemes/pisces.js?v=7.4.1"></script>
+
+<script src="/js/next-boot.js?v=7.4.1"></script><script src="/js/bookmark.js?v=7.4.1"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.getAttribute('pjax') !== null) {
+      element.setAttribute('pjax', '');
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.1"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.includes(item);
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'fdjYRPruAxgdCtAqFcoYgBrk-gzGzoHsz',
+    appKey: 'a40AomloSpFnoHG6fdAdB9fo',
+    placeholder: "你好像有自己的想法",
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: 'zh-CN' || 'zh-cn',
+    path: location.pathname,
+    recordIP: false,
+    serverURLs: ''
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>
